@@ -148,13 +148,11 @@ class OneOfKDataProvider(DataProvider):
 class WindPowerDataProvider(OneOfKDataProvider):
     """Data provider for wind power dataset."""
 
-    def __init__(self, which_set='train', batch_size=100, max_num_batches=-1,
+    def __init__(self, data_path, batch_size=100, max_num_batches=-1,
                  shuffle_order=True, rng=None):
         """Create a new data provider object.
 
         Args:
-            which_set: One of 'train', 'valid' or 'test'. Determines which
-                portion of the dataset this object should provide.
             batch_size (int): Number of data points to include in each batch.
             max_num_batches (int): Maximum number of batches to iterate over
                 in an epoch. If `max_num_batches * batch_size > num_data` then
@@ -165,20 +163,12 @@ class WindPowerDataProvider(OneOfKDataProvider):
             rng (RandomState): A seeded random number generator.
         """
         # check a valid which_set was provided
-        assert which_set in ['train', 'valid', 'test'], (
-            'Expected which_set to be either train, valid or test. '
-            'Got {0}'.format(which_set)
-        )
-        self.which_set = which_set
+
         self.num_classes = 1
-        # construct path to data using os.path.join to ensure the correct path
-        # separator for the current platform / OS is used
-        # MLP_DATA_DIR environment variable should point to the data directory
-        data_path = os.path.join(
-            os.environ['MLP_DATA_DIR'], 'wp-{0}.npz'.format(which_set))
         assert os.path.isfile(data_path), (
             'Data file does not exist at expected path: ' + data_path
         )
+        
         # load data from compressed numpy file
         loaded = np.load(data_path)
         inputs, targets = loaded['inputs'], loaded['targets']
